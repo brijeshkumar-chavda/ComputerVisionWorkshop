@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { API_URL } from "../config/api";
 
 export const ImageView = ({ setLoading, setResult }) => {
-  const [imageUrl, setImageUrl] = useState("");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -10,7 +9,6 @@ export const ImageView = ({ setLoading, setResult }) => {
     const selected = e.target.files[0];
     if (selected) {
       setFile(selected);
-      setImageUrl("");
       setPreview(URL.createObjectURL(selected));
       setResult("");
     }
@@ -19,22 +17,12 @@ export const ImageView = ({ setLoading, setResult }) => {
   const analyzeImage = async () => {
     setLoading(true);
     try {
-      let body;
-      let headers = {};
-
-      if (imageUrl) {
-        body = JSON.stringify({ imageUrl });
-        headers = { "Content-Type": "application/json" };
-      } else {
-        const formData = new FormData();
-        formData.append("image", file);
-        body = formData;
-      }
+      const formData = new FormData();
+      formData.append("image", file);
 
       const res = await fetch(`${API_URL}/analyze-image`, {
         method: "POST",
-        headers: headers,
-        body: body,
+        body: formData,
       });
       const data = await res.json();
       setResult(data.result || data.error);
@@ -49,17 +37,6 @@ export const ImageView = ({ setLoading, setResult }) => {
     <>
       <div className="input-group">
         <input type="file" accept="image/*" onChange={handleFileChange} />
-        <span className="or-divider">- OR -</span>
-        <input
-          type="text"
-          placeholder="Paste image URL here..."
-          value={imageUrl}
-          onChange={(e) => {
-            setImageUrl(e.target.value);
-            setPreview(e.target.value);
-            setFile(null);
-          }}
-        />
       </div>
 
       <div className="preview-box">
@@ -70,13 +47,11 @@ export const ImageView = ({ setLoading, setResult }) => {
             onError={(e) => (e.target.src = "")}
           />
         ) : (
-          <p>Select an image or paste a URL</p>
+          <p>Select an image to analyze</p>
         )}
       </div>
 
-      {(file || imageUrl) && (
-        <button onClick={analyzeImage}>Analyze Image</button>
-      )}
+      {file && <button onClick={analyzeImage}>Analyze Image</button>}
     </>
   );
 };

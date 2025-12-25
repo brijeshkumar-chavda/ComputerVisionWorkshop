@@ -36,7 +36,9 @@ export const VideoView = ({ setLoading, setResult }) => {
 
   return (
     <>
-      <input type="file" accept="video/*" onChange={handleFileChange} />
+      <div className="input-group">
+        <input type="file" accept="video/*" onChange={handleFileChange} />
+      </div>
       <div className="preview-box">
         {preview ? (
           <video src={preview} controls />

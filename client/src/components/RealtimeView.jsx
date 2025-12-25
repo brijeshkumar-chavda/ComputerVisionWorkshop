@@ -57,8 +57,18 @@ export const RealtimeView = ({ setResult }) => {
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          videoConstraints={{ facingMode: "user" }}
-          style={{ width: "100%", height: "100%" }}
+          videoConstraints={{
+            facingMode: "user",
+            aspectRatio: 1, // Request square aspect ratio from camera if possible
+          }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            position: "absolute", // Force it to sit inside the relative parent
+            top: 0,
+            left: 0,
+          }}
         />
       </div>
       <div className="controls" style={{ marginTop: "1rem" }}>

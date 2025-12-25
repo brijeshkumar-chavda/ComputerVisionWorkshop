@@ -58,28 +58,61 @@ app.post("/api/analyze-image", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image or URL provided" });
     }
 
+    if (!objectContent) {
+      console.log("Error: No image content found. REQ BODY:", req.body);
+      return res.status(400).json({ error: "No image or URL provided" });
+    }
+
+    console.log("Analyzing Image...", req.body.imageUrl ? "URL" : "FILE");
+
     const response = await client.chat.completions.create({
-      model: process.env.AZURE_OPENAI_DEPLOYMENT, // Not always needed for Azure, but good practice
+      model: process.env.AZURE_OPENAI_DEPLOYMENT,
       messages: [
         {
           role: "system",
-          content: "You are a helpful AI that describes images detailedly.",
+          content: `You are an AI Vision Assistant. Identify the main object in the image.
+                    
+                    Return ONLY the name of the object.
+                    Do not explain. Do not add punctuation like periods.
+                    Example: "Persian Cat" or "Eiffel Tower"
+                    `,
         },
         {
           role: "user",
-          content: [
-            { type: "text", text: "What is in this image? Describe it." },
-            objectContent,
-          ],
+          content: [{ type: "text", text: "Identify this." }, objectContent],
         },
       ],
-      max_tokens: 500,
+      max_tokens: 300,
     });
 
     res.json({ result: response.choices[0].message.content });
   } catch (error) {
     console.error("Error analyzing image:", error);
-    res.status(500).json({ error: error.message });
+    if (error.response) {
+      console.error("OpenAI Response Error:", error.response.data);
+    }
+
+    // Handle Content Filter or 400 Bad Request from Azure
+    console.log("Error object details:", error); // Debugging
+    if (
+      error.code === "content_filter" ||
+      (error.error && error.error.code === "content_filter")
+    ) {
+      return res.json({
+        result:
+          "I cannot analyze this image due to safety content filters (Azure OpenAI Refusal).",
+      });
+    }
+
+    // Fallback for general errors
+    if (error.error && error.error.message) {
+      return res.json({ result: `Error: ${error.error.message}` });
+    }
+
+    res.status(500).json({
+      error:
+        "Failed to analyze image. Ensure the URL is directly accessible (ends in .jpg/.png) and not protected.",
+    });
   }
 });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { TabNavigation } from "./components/TabNavigation";
@@ -9,15 +9,22 @@ import { RealtimeView } from "./components/RealtimeView";
 
 function App() {
   const [activeTab, setActiveTab] = useState("image");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   // Shared State
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+  }, [darkMode]);
+
   const toggleTheme = () => {
     setDarkMode(!darkMode);
-    document.body.classList.toggle("dark-mode");
   };
 
   const handleTabChange = (tab) => {
