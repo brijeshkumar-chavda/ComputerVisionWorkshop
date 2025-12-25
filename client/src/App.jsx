@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { ThemeToggle } from "./components/ThemeToggle";
-import { TabNavigation } from "./components/TabNavigation";
-import { ResultPanel } from "./components/ResultPanel";
-import { ImageView } from "./components/ImageView";
-import { VideoView } from "./components/VideoView";
-import { RealtimeView } from "./components/RealtimeView";
+import { ThemeToggle } from "./components/ThemeToggle/ThemeToggle";
+import { TabNavigation } from "./components/TabNavigation/TabNavigation";
+import { ResultPanel } from "./components/ResultPanel/ResultPanel";
+import { ImageView } from "./components/ImageView/ImageView";
+import { VideoView } from "./components/VideoView/VideoView";
+import { RealtimeView } from "./components/RealtimeView/RealtimeView";
 
 function App() {
   const [activeTab, setActiveTab] = useState("image");

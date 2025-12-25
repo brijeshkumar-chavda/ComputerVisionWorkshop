@@ -116,6 +116,76 @@ app.post("/api/analyze-image", upload.single("image"), async (req, res) => {
   }
 });
 
+// Route: Analyze Live Feed (Structured)
+app.post("/api/analyze-live", upload.single("image"), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "No image capture received" });
+    }
+
+    const objectContent = {
+      type: "image_url",
+      image_url: {
+        url: `data:image/jpeg;base64,${file.buffer.toString("base64")}`,
+      },
+    };
+
+    const response = await client.chat.completions.create({
+      model: process.env.AZURE_OPENAI_DEPLOYMENT,
+      messages: [
+        {
+          role: "system",
+          content: `You are an AI Vision Assistant analyzing a live camera feed.
+          
+          Return a raw, valid JSON object (no markdown, no backticks) with exactly these fields:
+          {
+             "general_description": "2-3 sentences describing the scene.",
+             "number_of_people": "Count (e.g., '1 person', 'No people', '3 people')",
+             "objects": "List of main objects (e.g., 'Laptop, Coffee Cup, Keyboard')"
+          }
+          `,
+        },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Analyze this frame." },
+            objectContent,
+          ],
+        },
+      ],
+      max_tokens: 300,
+    });
+
+    let result = response.choices[0].message.content;
+
+    // Clean up potential markdown code blocks if AI adds them
+    if (result.startsWith("```")) {
+      result = result
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+    }
+
+    try {
+      const jsonResult = JSON.parse(result);
+      res.json({ result: jsonResult });
+    } catch (e) {
+      console.error("Failed to parse AI JSON:", result);
+      res.json({
+        result: {
+          general_description: "Error parsing AI response",
+          number_of_people: "Unknown",
+          objects: "Unknown",
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error analyzing live feed:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Route: Analyze Video
 app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
   try {

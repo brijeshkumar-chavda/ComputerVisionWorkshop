@@ -1,0 +1,33 @@
+/* Tabs - Segmented Control Style */
+.tabs {
+  display: flex;
+  background: var(--tab-bg);
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+  font-weight: 600;
+  box-shadow: 0 1px 3px var(--shadow-color);
+}

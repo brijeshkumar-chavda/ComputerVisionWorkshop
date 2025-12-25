@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import Webcam from "react-webcam";
-import { API_URL } from "../config/api";
+import { API_URL } from "../../../config/api";
+import "./RealtimeView.css";
 
 export const RealtimeView = ({ setResult }) => {
   const webcamRef = useRef(null);
@@ -20,7 +21,7 @@ export const RealtimeView = ({ setResult }) => {
       formData.append("image", file);
 
       try {
-        const apiRes = await fetch(`${API_URL}/analyze-image`, {
+        const apiRes = await fetch(`${API_URL}/analyze-live`, {
           method: "POST",
           body: formData,
         });
@@ -35,6 +36,10 @@ export const RealtimeView = ({ setResult }) => {
   const startRealtime = () => {
     setIsCapturing(true);
     setResult("Starting vision stream...");
+
+    // Trigger immediately first time (so user doesn't wait 5s)
+    setTimeout(() => captureAndAnalyze(), 100);
+
     intervalRef.current = setInterval(captureAndAnalyze, 5000);
   };
 
@@ -61,23 +66,16 @@ export const RealtimeView = ({ setResult }) => {
             facingMode: "user",
             aspectRatio: 1, // Request square aspect ratio from camera if possible
           }}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            position: "absolute", // Force it to sit inside the relative parent
-            top: 0,
-            left: 0,
-          }}
+          className="webcam-video"
         />
       </div>
-      <div className="controls" style={{ marginTop: "1rem" }}>
+      <div className="controls">
         {!isCapturing ? (
-          <button onClick={startRealtime} style={{ background: "#22c55e" }}>
+          <button onClick={startRealtime} className="btn-start">
             Start AI Vision
           </button>
         ) : (
-          <button onClick={stopRealtime} style={{ background: "#ef4444" }}>
+          <button onClick={stopRealtime} className="btn-stop">
             Stop
           </button>
         )}

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { API_URL } from "../config/api";
+import { API_URL } from "../../../config/api";
+import "./VideoView.css";
 
-export const ImageView = ({ setLoading, setResult }) => {
+export const VideoView = ({ setLoading, setResult }) => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -14,13 +15,14 @@ export const ImageView = ({ setLoading, setResult }) => {
     }
   };
 
-  const analyzeImage = async () => {
+  const analyzeVideo = async () => {
+    if (!file) return;
     setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
+    const formData = new FormData();
+    formData.append("video", file);
 
-      const res = await fetch(`${API_URL}/analyze-image`, {
+    try {
+      const res = await fetch(`${API_URL}/analyze-video`, {
         method: "POST",
         body: formData,
       });
@@ -36,22 +38,16 @@ export const ImageView = ({ setLoading, setResult }) => {
   return (
     <>
       <div className="input-group">
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+        <input type="file" accept="video/*" onChange={handleFileChange} />
       </div>
-
       <div className="preview-box">
         {preview ? (
-          <img
-            src={preview}
-            alt="Preview"
-            onError={(e) => (e.target.src = "")}
-          />
+          <video src={preview} controls />
         ) : (
-          <p>Select an image to analyze</p>
+          <p>Select a video (&gt;10mb recommended)</p>
         )}
       </div>
-
-      {file && <button onClick={analyzeImage}>Analyze Image</button>}
+      {file && <button onClick={analyzeVideo}>Analyze Video</button>}
     </>
   );
 };

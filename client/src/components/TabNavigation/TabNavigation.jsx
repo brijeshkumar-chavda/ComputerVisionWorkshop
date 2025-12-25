@@ -1,4 +1,5 @@
 import React from "react";
+import "./TabNavigation.css";
 
 export const TabNavigation = ({ activeTab, handleTabChange }) => (
   <div className="tabs">
