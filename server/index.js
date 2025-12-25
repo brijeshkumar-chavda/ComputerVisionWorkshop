@@ -37,10 +37,26 @@ function encodeImage(imagePath) {
 // Route: Analyze Image
 app.post("/api/analyze-image", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "No image uploaded" });
+    let objectContent;
 
-    const base64Image = encodeImage(req.file.path);
-    const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+    // Check if it's a file upload
+    if (req.file) {
+      const base64Image = encodeImage(req.file.path);
+      const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
+      objectContent = { type: "image_url", image_url: { url: dataUrl } };
+
+      // Cleanup file immediately after reading
+      fs.unlinkSync(req.file.path);
+
+      // Check if it's a URL
+    } else if (req.body.imageUrl) {
+      objectContent = {
+        type: "image_url",
+        image_url: { url: req.body.imageUrl },
+      };
+    } else {
+      return res.status(400).json({ error: "No image or URL provided" });
+    }
 
     const response = await client.chat.completions.create({
       model: process.env.AZURE_OPENAI_DEPLOYMENT, // Not always needed for Azure, but good practice
@@ -53,15 +69,12 @@ app.post("/api/analyze-image", upload.single("image"), async (req, res) => {
           role: "user",
           content: [
             { type: "text", text: "What is in this image? Describe it." },
-            { type: "image_url", image_url: { url: dataUrl } },
+            objectContent,
           ],
         },
       ],
       max_tokens: 500,
     });
-
-    // Cleanup
-    fs.unlinkSync(req.file.path);
 
     res.json({ result: response.choices[0].message.content });
   } catch (error) {

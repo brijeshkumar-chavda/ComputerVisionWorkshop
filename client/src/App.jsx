@@ -6,6 +6,7 @@ const API_URL = "http://localhost:5000/api";
 
 function App() {
   const [activeTab, setActiveTab] = useState("image"); // image, video, realtime
+  const [imageUrl, setImageUrl] = useState("");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState("");
@@ -18,6 +19,7 @@ function App() {
 
   const resetState = () => {
     setFile(null);
+    setImageUrl("");
     setPreview(null);
     setResult("");
     setLoading(false);
@@ -33,20 +35,32 @@ function App() {
     const selected = e.target.files[0];
     if (selected) {
       setFile(selected);
+      setImageUrl(""); // Clear URL if file is selected
       setPreview(URL.createObjectURL(selected));
       setResult("");
     }
   };
 
-  const analyzeImage = async (imageFile) => {
+  const analyzeImage = async (imageFile, url = null) => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append("image", imageFile);
 
     try {
+      let body;
+      let headers = {};
+
+      if (url) {
+        body = JSON.stringify({ imageUrl: url });
+        headers = { "Content-Type": "application/json" };
+      } else {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        body = formData;
+      }
+
       const res = await fetch(`${API_URL}/analyze-image`, {
         method: "POST",
-        body: formData,
+        headers: headers,
+        body: body,
       });
       const data = await res.json();
       setResult(data.result || data.error);
@@ -148,16 +162,38 @@ function App() {
         {/* IMAGE TAB */}
         {activeTab === "image" && (
           <>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <div className="input-group">
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+              <span className="or-divider">- OR -</span>
+              <input
+                type="text"
+                placeholder="Paste image URL here..."
+                value={imageUrl}
+                onChange={(e) => {
+                  setImageUrl(e.target.value);
+                  setPreview(e.target.value);
+                  setFile(null); // Clear file if URL is used
+                }}
+              />
+            </div>
+
             <div className="preview-box">
               {preview ? (
-                <img src={preview} alt="Preview" />
+                <img
+                  src={preview}
+                  alt="Preview"
+                  onError={(e) => (e.target.src = "")}
+                />
               ) : (
-                <p>Select an image to analyze</p>
+                <p>Select an image or paste a URL</p>
               )}
             </div>
-            {file && (
-              <button onClick={() => analyzeImage(file)} disabled={loading}>
+
+            {(file || imageUrl) && (
+              <button
+                onClick={() => analyzeImage(file, imageUrl)}
+                disabled={loading}
+              >
                 {loading ? "Analyzing..." : "Analyze Image"}
               </button>
             )}
