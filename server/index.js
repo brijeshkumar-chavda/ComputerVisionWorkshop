@@ -6,10 +6,12 @@ const path = require("path");
 const { OpenAI } = require("openai");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegPath = require("ffmpeg-static");
+const ffprobePath = require("ffprobe-static");
 require("dotenv").config();
 
 // Configuration
 ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfprobePath(ffprobePath.path);
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -71,21 +73,49 @@ app.post("/api/analyze-image", upload.single("image"), async (req, res) => {
         {
           role: "system",
           content: `You are an AI Vision Assistant. Identify the main object in the image.
-                    
-                    Return ONLY the name of the object.
-                    Do not explain. Do not add punctuation like periods.
-                    Example: "Persian Cat" or "Eiffel Tower"
-                    `,
+          
+          Return a raw, valid JSON object (no markdown, no backticks) with exactly these fields:
+          {
+             "general_description": "2-3 sentences describing the image.",
+             "number_of_people": "Count (e.g., '1 person', 'No people', '3 people')",
+             "objects": "List of main objects (e.g., 'Persian Cat, Sofa, Window')"
+          }
+          `,
         },
         {
           role: "user",
-          content: [{ type: "text", text: "Identify this." }, objectContent],
+          content: [
+            { type: "text", text: "Analyze this image." },
+            objectContent,
+          ],
         },
       ],
       max_tokens: 300,
     });
 
-    res.json({ result: response.choices[0].message.content });
+    let result = response.choices[0].message.content;
+
+    // Clean up potential markdown code blocks
+    if (result.startsWith("```")) {
+      result = result
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+    }
+
+    try {
+      const jsonResult = JSON.parse(result);
+      res.json({ result: jsonResult });
+    } catch (e) {
+      console.error("Failed to parse AI JSON:", result);
+      res.json({
+        result: {
+          general_description: result,
+          number_of_people: "Unknown",
+          objects: "Unknown",
+        },
+      });
+    }
   } catch (error) {
     console.error("Error analyzing image:", error);
     if (error.response) {
@@ -238,7 +268,18 @@ app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
     const response = await client.chat.completions.create({
       model: process.env.AZURE_OPENAI_DEPLOYMENT,
       messages: [
-        { role: "system", content: "You are a video analysis AI." },
+        {
+          role: "system",
+          content: `You are a video analysis AI.
+          
+          Return a raw, valid JSON object (no markdown, no backticks) with exactly these fields:
+          {
+             "general_description": "2-3 sentences describing the action in the video.",
+             "number_of_people": "Count (e.g., '1 person', 'No people', '3 people')",
+             "objects": "List of main objects (e.g., 'Robot, Box, Shelf')"
+          }
+          `,
+        },
         { role: "user", content: contentContent },
       ],
       max_tokens: 500,
@@ -248,7 +289,29 @@ app.post("/api/analyze-video", upload.single("video"), async (req, res) => {
     fs.unlinkSync(videoPath);
     fs.rmSync(screenshotsDir, { recursive: true, force: true });
 
-    res.json({ result: response.choices[0].message.content });
+    let result = response.choices[0].message.content;
+
+    // Clean up potential markdown code blocks
+    if (result.startsWith("```")) {
+      result = result
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+    }
+
+    try {
+      const jsonResult = JSON.parse(result);
+      res.json({ result: jsonResult });
+    } catch (e) {
+      console.error("Failed to parse AI JSON:", result);
+      res.json({
+        result: {
+          general_description: result,
+          number_of_people: "Unknown",
+          objects: "Unknown",
+        },
+      });
+    }
   } catch (error) {
     console.error("Error analyzing video:", error);
     res.status(500).json({ error: error.message });

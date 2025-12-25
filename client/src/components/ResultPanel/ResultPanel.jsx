@@ -19,19 +19,15 @@ export const ResultPanel = ({ result, loading }) => {
               <div className="structured-output">
                 <div className="field-box">
                   <label>General Description</label>
-                  <textarea
-                    readOnly
-                    value={result.general_description}
-                    rows={3}
-                  />
+                  <p className="value-text">{result.general_description}</p>
                 </div>
                 <div className="field-box">
                   <label>Number of People</label>
-                  <input type="text" readOnly value={result.number_of_people} />
+                  <p className="value-text">{result.number_of_people}</p>
                 </div>
                 <div className="field-box">
                   <label>Objects Detected</label>
-                  <textarea readOnly value={result.objects} rows={2} />
+                  <p className="value-text">{result.objects}</p>
                 </div>
               </div>
             ) : (

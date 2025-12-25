@@ -15,10 +15,6 @@
   min-height: 400px;
 }
 
-.result-box.has-result {
-  /* Optional: different style when result works */
-}
-
 .result-content {
   width: 100%;
 }
@@ -46,18 +42,19 @@
   letter-spacing: 0.5px;
 }
 
-.field-box textarea,
-.field-box input {
+.field-box .value-text {
   width: 100%;
   background: transparent;
   border: none;
   color: var(--text-primary);
   font-size: 0.95rem;
   font-family: inherit;
-  resize: none;
   outline: none;
   padding: 0;
   margin-top: 4px;
+  white-space: pre-wrap; /* Preserve newlines */
+  overflow-wrap: break-word; /* Prevent overflow */
+  line-height: 1.5;
 }
 
 .placeholder-text {
