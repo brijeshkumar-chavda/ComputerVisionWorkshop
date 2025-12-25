@@ -148,7 +148,7 @@ function App() {
         {darkMode ? "☀️" : "🌙"}
       </button>
 
-      <h1>👁️ AI Vision Assistant</h1>
+      <h1>AI Vision Assistant</h1>
 
       <div className="tabs">
         <button
