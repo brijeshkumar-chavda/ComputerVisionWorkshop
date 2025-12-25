@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { API_URL } from "../../../config/api";
+import { API_URL } from "../../config/api";
 import "./VideoView.css";
 
 export const VideoView = ({ setLoading, setResult }) => {

@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import Webcam from "react-webcam";
-import { API_URL } from "../../../config/api";
+import { API_URL } from "../../config/api";
 import "./RealtimeView.css";
 
 export const RealtimeView = ({ setResult }) => {
