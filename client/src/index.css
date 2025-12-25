@@ -1,6 +1,42 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 /* Reset & Base */
+:root {
+  --bg-color: #f3f4f6;
+  --card-bg: #ffffff;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --input-bg: #f9fafb;
+  --input-border: #d1d5db;
+  --preview-bg: #f8fafc;
+  --preview-border: #f1f5f9;
+  --result-bg: linear-gradient(to right, #f8fafc, #f1f5f9);
+  --result-border: #e2e8f0;
+  --tab-bg: #f3f4f6;
+  --tab-active-bg: #ffffff;
+  --tab-active-text: #2563eb;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --toggle-bg: #e5e7eb;
+}
+
+body.dark-mode {
+  --bg-color: #111827;
+  --card-bg: #1f2937;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --input-bg: #374151;
+  --input-border: #4b5563;
+  --preview-bg: #111827;
+  --preview-border: #374151;
+  --result-bg: #111827;
+  --result-border: #374151;
+  --tab-bg: #374151;
+  --tab-active-bg: #4b5563;
+  --tab-active-text: #60a5fa;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --toggle-bg: #4b5563;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,26 +45,28 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background-color: #f3f4f6; /* Cool Gray 100 */
-  color: #1f2937; /* Gray 800 */
+  background-color: var(--bg-color);
+  color: var(--text-primary);
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Main Card */
 .app-container {
   width: 100%;
   max-width: 700px;
-  background: white;
+  background: var(--card-bg);
   padding: 2.5rem;
   border-radius: 24px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px var(--shadow-color),
+    0 2px 4px -1px var(--shadow-color), 0 20px 25px -5px var(--shadow-color);
   text-align: center;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background-color 0.3s;
+  position: relative;
 }
 
 h1 {
@@ -37,14 +75,16 @@ h1 {
   margin-bottom: 2rem;
   background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback */
   letter-spacing: -0.025em;
 }
 
 /* Tabs - Segmented Control Style */
 .tabs {
   display: flex;
-  background: #f3f4f6;
+  background: var(--tab-bg);
   padding: 4px;
   border-radius: 12px;
   margin-bottom: 2rem;
@@ -58,21 +98,21 @@ h1 {
   background: transparent;
   cursor: pointer;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-secondary);
   border-radius: 8px;
   transition: all 0.2s ease;
   font-size: 0.95rem;
 }
 
 .tab-btn:hover {
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .tab-btn.active {
-  background: white;
-  color: #2563eb;
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-color);
 }
 
 /* Content Area */
@@ -93,8 +133,8 @@ input[type="file"] {
   display: block;
   width: 100%;
   padding: 10px;
-  background: #f9fafb;
-  border: 1px dashed #d1d5db;
+  background: var(--input-bg);
+  border: 1px dashed var(--input-border);
   border-radius: 8px;
   cursor: pointer;
 }
@@ -103,21 +143,21 @@ input[type="file"]::file-selector-button {
   margin-right: 15px;
   padding: 6px 12px;
   border: none;
-  background: #e5e7eb;
+  background: var(--toggle-bg);
   border-radius: 6px;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
 }
 
 input[type="file"]::file-selector-button:hover {
-  background: #d1d5db;
+  background: var(--input-border);
 }
 
 .or-divider {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-weight: 500;
   letter-spacing: 1px;
 }
@@ -125,7 +165,9 @@ input[type="file"]::file-selector-button:hover {
 input[type="text"] {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-primary);
   border-radius: 10px;
   font-size: 1rem;
   outline: none;
@@ -173,13 +215,13 @@ button:disabled {
 .preview-box {
   width: 100%;
   min-height: 300px;
-  background: #f8fafc;
+  background: var(--preview-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 16px;
-  border: 2px solid #f1f5f9;
+  border: 2px solid var(--preview-border);
 }
 
 .preview-box img,
@@ -191,24 +233,23 @@ button:disabled {
 }
 
 .preview-box p {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 /* Results */
 .result-box {
   text-align: left;
-  background: #f0fdf4; /* Very light green hint for specific success feel, or neutral */
-  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+  background: var(--result-bg);
   padding: 1.5rem;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--result-border);
   margin-top: 1rem;
 }
 
 .result-box h3 {
   font-size: 1.1rem;
-  color: #374151;
+  color: var(--text-primary);
   margin-bottom: 0.8rem;
   display: flex;
   align-items: center;
@@ -217,8 +258,35 @@ button:disabled {
 
 .result-box p {
   line-height: 1.6;
-  color: #4b5563;
+  color: var(--text-primary);
   white-space: pre-wrap; /* Preserves formatting from AI */
+}
+
+/* Toggle Dark Mode Button */
+.theme-toggle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--toggle-bg);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  transition: background 0.3s;
+  box-shadow: none;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--input-border);
+  transform: scale(1.1);
+  box-shadow: none;
 }
 
 /* Loading Animation */

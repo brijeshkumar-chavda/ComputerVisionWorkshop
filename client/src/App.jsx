@@ -17,6 +17,15 @@ function App() {
   const [isCapturing, setIsCapturing] = useState(false);
   const intervalRef = useRef(null);
 
+  // Theme State
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Toggle Theme
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+    document.body.classList.toggle("dark-mode");
+  };
+
   const resetState = () => {
     setFile(null);
     setImageUrl("");
@@ -135,6 +144,10 @@ function App() {
 
   return (
     <div className="app-container">
+      <button className="theme-toggle" onClick={toggleTheme}>
+        {darkMode ? "☀️" : "🌙"}
+      </button>
+
       <h1>👁️ AI Vision Assistant</h1>
 
       <div className="tabs">
