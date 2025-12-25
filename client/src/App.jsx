@@ -150,130 +150,143 @@ function App() {
 
       <h1>AI Vision Assistant</h1>
 
-      <div className="tabs">
-        <button
-          className={`tab-btn ${activeTab === "image" ? "active" : ""}`}
-          onClick={() => handleTabChange("image")}
-        >
-          📷 Image Analysis
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "video" ? "active" : ""}`}
-          onClick={() => handleTabChange("video")}
-        >
-          🎥 Video Analysis
-        </button>
-        <button
-          className={`tab-btn ${activeTab === "realtime" ? "active" : ""}`}
-          onClick={() => handleTabChange("realtime")}
-        >
-          🔴 Real-time Cam
-        </button>
-      </div>
-
-      <div className="content-area">
-        {/* IMAGE TAB */}
-        {activeTab === "image" && (
-          <>
-            <div className="input-group">
-              <input type="file" accept="image/*" onChange={handleFileChange} />
-              <span className="or-divider">- OR -</span>
-              <input
-                type="text"
-                placeholder="Paste image URL here..."
-                value={imageUrl}
-                onChange={(e) => {
-                  setImageUrl(e.target.value);
-                  setPreview(e.target.value);
-                  setFile(null); // Clear file if URL is used
-                }}
-              />
-            </div>
-
-            <div className="preview-box">
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  onError={(e) => (e.target.src = "")}
-                />
-              ) : (
-                <p>Select an image or paste a URL</p>
-              )}
-            </div>
-
-            {(file || imageUrl) && (
-              <button
-                onClick={() => analyzeImage(file, imageUrl)}
-                disabled={loading}
-              >
-                {loading ? "Analyzing..." : "Analyze Image"}
-              </button>
-            )}
-          </>
-        )}
-
-        {/* VIDEO TAB */}
-        {activeTab === "video" && (
-          <>
-            <input type="file" accept="video/*" onChange={handleFileChange} />
-            <div className="preview-box">
-              {preview ? (
-                <video src={preview} controls />
-              ) : (
-                <p>Select a video (>10mb recommended)</p>
-              )}
-            </div>
-            {file && (
-              <button onClick={analyzeVideo} disabled={loading}>
-                {loading
-                  ? "Processing Video (This takes time)..."
-                  : "Analyze Video"}
-              </button>
-            )}
-          </>
-        )}
-
-        {/* REALTIME TAB */}
-        {activeTab === "realtime" && (
-          <>
-            <div className="preview-box">
-              <Webcam
-                audio={false}
-                ref={webcamRef}
-                screenshotFormat="image/jpeg"
-                videoConstraints={{ facingMode: "user" }}
-                style={{ width: "100%", height: "100%" }}
-              />
-            </div>
-            <div className="controls">
-              {!isCapturing ? (
-                <button
-                  onClick={startRealtime}
-                  style={{ background: "#22c55e" }}
-                >
-                  Start AI Vision
-                </button>
-              ) : (
-                <button
-                  onClick={stopRealtime}
-                  style={{ background: "#ef4444" }}
-                >
-                  Stop
-                </button>
-              )}
-            </div>
-            {isCapturing && <p className="loading">AI is watching...</p>}
-          </>
-        )}
-
-        {/* RESULTS AREA */}
-        {result && (
-          <div className="result-box">
-            <h3>🤖 AI Analysis:</h3>
-            <p>{result}</p>
+      <div className="main-layout">
+        <div className="left-panel">
+          <div className="tabs">
+            <button
+              className={`tab-btn ${activeTab === "image" ? "active" : ""}`}
+              onClick={() => handleTabChange("image")}
+            >
+              📷 Image
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "video" ? "active" : ""}`}
+              onClick={() => handleTabChange("video")}
+            >
+              🎥 Video
+            </button>
+            <button
+              className={`tab-btn ${activeTab === "realtime" ? "active" : ""}`}
+              onClick={() => handleTabChange("realtime")}
+            >
+              🔴 Live
+            </button>
           </div>
-        )}
+
+          <div className="content-area">
+            {/* IMAGE TAB */}
+            {activeTab === "image" && (
+              <>
+                <div className="input-group">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <span className="or-divider">- OR -</span>
+                  <input
+                    type="text"
+                    placeholder="Paste image URL here..."
+                    value={imageUrl}
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                      setPreview(e.target.value);
+                      setFile(null); // Clear file if URL is used
+                    }}
+                  />
+                </div>
+
+                <div className="preview-box">
+                  {preview ? (
+                    <img
+                      src={preview}
+                      alt="Preview"
+                      onError={(e) => (e.target.src = "")}
+                    />
+                  ) : (
+                    <p>Select an image or paste a URL</p>
+                  )}
+                </div>
+
+                {(file || imageUrl) && (
+                  <button
+                    onClick={() => analyzeImage(file, imageUrl)}
+                    disabled={loading}
+                  >
+                    {loading ? "Analyzing..." : "Analyze Image"}
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* VIDEO TAB */}
+            {activeTab === "video" && (
+              <>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleFileChange}
+                />
+                <div className="preview-box">
+                  {preview ? (
+                    <video src={preview} controls />
+                  ) : (
+                    <p>Select a video (>10mb recommended)</p>
+                  )}
+                </div>
+                {file && (
+                  <button onClick={analyzeVideo} disabled={loading}>
+                    {loading ? "Processing Video..." : "Analyze Video"}
+                  </button>
+                )}
+              </>
+            )}
+
+            {/* REALTIME TAB */}
+            {activeTab === "realtime" && (
+              <>
+                <div className="preview-box">
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    videoConstraints={{ facingMode: "user" }}
+                    style={{ width: "100%", height: "100%" }}
+                  />
+                </div>
+                <div className="controls">
+                  {!isCapturing ? (
+                    <button
+                      onClick={startRealtime}
+                      style={{ background: "#22c55e" }}
+                    >
+                      Start AI Vision
+                    </button>
+                  ) : (
+                    <button
+                      onClick={stopRealtime}
+                      style={{ background: "#ef4444" }}
+                    >
+                      Stop
+                    </button>
+                  )}
+                </div>
+                {isCapturing && <p className="loading">AI is watching...</p>}
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="right-panel">
+          <div className="result-box">
+            <h3>🤖 AI Analysis</h3>
+            {loading && <p className="loading">Generating insight...</p>}
+            {!result && !loading && (
+              <p className="placeholder-text">Results will appear here...</p>
+            )}
+            {result && <p>{result}</p>}
+          </div>
+        </div>
       </div>
     </div>
   );
