@@ -124,12 +124,16 @@ app.post("/api/analyze-live", upload.single("image"), async (req, res) => {
       return res.status(400).json({ error: "No image capture received" });
     }
 
+    const base64Image = encodeImage(file.path);
     const objectContent = {
       type: "image_url",
       image_url: {
-        url: `data:image/jpeg;base64,${file.buffer.toString("base64")}`,
+        url: `data:image/jpeg;base64,${base64Image}`,
       },
     };
+
+    // Cleanup file immediately after reading
+    fs.unlinkSync(file.path);
 
     const response = await client.chat.completions.create({
       model: process.env.AZURE_OPENAI_DEPLOYMENT,
