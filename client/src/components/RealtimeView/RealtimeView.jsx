@@ -26,9 +26,11 @@ export const RealtimeView = ({ setResult }) => {
           body: formData,
         });
         const data = await apiRes.json();
+        if (data.error) throw new Error(data.error);
         setResult((prev) => data.result);
       } catch (err) {
         console.error(err);
+        setResult("Error: " + err.message);
       }
     }
   }, [webcamRef, setResult]);
